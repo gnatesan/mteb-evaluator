@@ -6,6 +6,65 @@ from typing import Dict, List, Tuple
 import torch
 
 
+def energy_calc(x, y):
+    M = x.shape[0]
+    N = y.shape[0]
+
+    ed_sum = 0
+    for j in range(M):
+        for l in range(N):
+            ed_sum += (torch.sum(torch.abs(x[j] - y[l]) ** 2) ** (1 / 2))
+
+    ei_x = 0
+    for j in range(M):
+        for k in range(M):
+            ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
+
+    ei_y = 0
+    for j in range(N):
+        for k in range(N):
+            ei_y += (torch.sum(torch.abs(y[j] - y[k]) ** 2) ** (1 / 2))
+
+    return 2*ed_sum / (M * N) - ei_x / (M * M) - ei_y / (N * N)
+
+def energy_distance(x, y):
+    """
+    Computes the energy distance energy_distance(a[i], b[j]) for all i and j.
+    a is a Matrix of vectors where each row represents a multi-vector query
+    and b is a Matrix where each row represents a single-vector document.
+    :return: Matrix with res[i][j]  = energy_distance(a[i], b[j])
+    """
+
+    if not isinstance(x, torch.Tensor):
+        x = torch.tensor(x)
+
+    if not isinstance(y, torch.Tensor):
+        y = torch.tensor(y)
+
+    if len(x.shape) == 1:
+        x = x.unsqueeze(0)
+
+    if len(y.shape) == 1:
+        y = y.unsqueeze(0)
+
+    num_queries = x.shape[0] #number of queries
+    num_documents = y.shape[0] #number of documents
+
+    # Create a tensor of shape M*N filled with zeros
+    tensor = torch.zeros(num_queries * num_documents)
+
+    # Reshape the tensor to shape MxN
+    tensor = tensor.reshape(num_queries, num_documents)
+
+    for i in range(num_queries):
+      for j in range(num_documents):
+        #print("Query: ", i, x[i].shape)
+        #print("Document: ", j, y[j].shape, y[j].reshape(1,-1).shape)
+        tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item()
+    #print("Answer ", tensor.shape, type(tensor))
+    return tensor
+	
+
 def cos_sim(a, b):
     """
     Computes the cosine similarity cos_sim(a[i], b[j]) for all i and j.
