@@ -34,7 +34,6 @@ def energy_distance(x, y):
     and b is a Matrix where each row represents a single-vector document.
     :return: Matrix with res[i][j]  = energy_distance(a[i], b[j])
     """
-
     if not isinstance(x, torch.Tensor):
         x = torch.tensor(x)
 

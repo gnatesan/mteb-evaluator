@@ -23,10 +23,11 @@ class DenseRetrievalExactSearch:
         # Model is class that provides encode_corpus() and encode_queries()
         self.model = model
         self.batch_size = batch_size
-        self.score_functions = {"cos_sim": cos_sim, "dot": dot_score}
+        self.score_functions = {"cos_sim": cos_sim, "dot": dot_score, "energy_dist": energy_distance}
         self.score_function_desc = {
             "cos_sim": "Cosine Similarity",
             "dot": "Dot Product",
+            "energy_dist": "Energy Distance"
         }
         self.corpus_chunk_size = corpus_chunk_size
         self.show_progress_bar = kwargs.get("show_progress_bar", True)
@@ -47,7 +48,7 @@ class DenseRetrievalExactSearch:
         # Returns a ranked list with the corpus ids
         if score_function not in self.score_functions:
             raise ValueError(
-                "score function: {} must be either (cos_sim) for cosine similarity or (dot) for dot product".format(
+                "score function: {} must be either (cos_sim) for cosine similarity, (dot) for dot product, or (energy_dist) for energy distance".format(
                     score_function
                 )
             )
@@ -96,20 +97,31 @@ class DenseRetrievalExactSearch:
                 convert_to_tensor=self.convert_to_tensor,
             )
 
-            # Compute similarites using either cosine-similarity or dot product
+            # Compute similarites using either cosine-similarity, dot product, or energy distance
             cos_scores = self.score_functions[score_function](
                 query_embeddings, sub_corpus_embeddings
             )
             cos_scores[torch.isnan(cos_scores)] = -1
 
-            # Get top-k values
-            cos_scores_top_k_values, cos_scores_top_k_idx = torch.topk(
-                cos_scores,
-                min(top_k + 1, len(cos_scores[1])),
-                dim=1,
-                largest=True,
-                sorted=return_sorted,
-            )
+            # If we are using energy distance as score function then top_k_values should be the smallest scores
+            if self.score_function == "cos_sim" or self.score_function == "dot":
+                # Get top-k values
+                cos_scores_top_k_values, cos_scores_top_k_idx = torch.topk(
+                    cos_scores,
+                    min(top_k + 1, len(cos_scores[1])),
+                    dim=1,
+                    largest=True,
+                    sorted=return_sorted,
+                )
+            elif self.score_function == "energy_dist":
+                cos_scores_top_k_values, cos_scores_top_k_idx = torch.topk(
+                    cos_scores,
+                    min(top_k + 1, len(cos_scores[1])),
+                    dim=1,
+                    largest=False,
+                    sorted=return_sorted,
+                )
+
             cos_scores_top_k_values = cos_scores_top_k_values.cpu().tolist()
             cos_scores_top_k_idx = cos_scores_top_k_idx.cpu().tolist()
 
@@ -191,7 +203,7 @@ class RetrievalEvaluator(Evaluator):
         self,
         retriever=None,
         k_values: List[int] = [1, 3, 5, 10, 100, 1000],
-        score_function: str = "cos_sim",
+        score_function: str = "energy_dist",
         **kwargs,
     ):
         super().__init__(**kwargs)
