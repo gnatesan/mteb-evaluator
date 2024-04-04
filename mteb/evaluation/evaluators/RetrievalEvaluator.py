@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 from sentence_transformers.models import Transformer, WordEmbeddings
 
 from .Evaluator import Evaluator
-from .utils import cos_sim, dot_score, hole, mrr, recall_cap, top_k_accuracy
+from .utils import energy_cal, energy_distance, cos_sim, dot_score, hole, mrr, recall_cap, top_k_accuracy
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +60,7 @@ class DenseRetrievalExactSearch:
         query_embeddings = self.model.encode_queries(
             queries,
             batch_size=self.batch_size,
+            output_value="token_embeddings"
             show_progress_bar=self.show_progress_bar,
             convert_to_tensor=self.convert_to_tensor,
         )
@@ -169,7 +170,7 @@ class DRESModel:
                 logger.warning(
                     "Queries will not be truncated. This could lead to memory issues. In that case please lower the batch_size."
                 )
-        return self.model.encode(queries, batch_size=batch_size, **kwargs)
+        return self.model.encode(queries, batch_size=batch_size, output_value="token_embeddings", **kwargs)
 
     def encode_corpus(self, corpus: List[Dict[str, str]], batch_size: int, **kwargs):
         if isinstance(corpus, dict):
