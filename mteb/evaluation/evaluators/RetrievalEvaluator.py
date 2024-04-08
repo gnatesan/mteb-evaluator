@@ -170,7 +170,7 @@ class DRESModel:
                 logger.warning(
                     "Queries will not be truncated. This could lead to memory issues. In that case please lower the batch_size."
                 )
-        return self.model.encode(queries, batch_size=batch_size, output_value="token_embeddings", **kwargs)
+        return self.model.encode(queries, batch_size=batch_size, output_value="token_embeddings")
 
     def encode_corpus(self, corpus: List[Dict[str, str]], batch_size: int, **kwargs):
         if isinstance(corpus, dict):

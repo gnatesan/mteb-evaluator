@@ -6,7 +6,7 @@ import os
 import pathlib
 import traceback
 from datetime import datetime
-from importlib.metadata import version
+from importlib.metadata import version, PackageNotFoundError
 from time import time
 from typing import List, Union
 
@@ -301,9 +301,15 @@ class MTEB:
                 logger.info(f"Loading dataset for {task.metadata_dict['name']}")
                 task.load_data(eval_splits=task_eval_splits, **kwargs)
 
+                try:
+                    mteb_version = version("mteb")  # noqa: F405
+                except PackageNotFoundError:
+                    mteb_version = "Unknown"
+
+
                 # run evaluation
                 task_results = {
-                    "mteb_version": version("mteb"),  # noqa: F405
+                    "mteb_version": mteb_version,  # noqa: F405
                     "dataset_revision": task.metadata_dict.get("revision", None),
                     "mteb_dataset_name": task.metadata_dict["name"],
                 }

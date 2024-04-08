@@ -34,7 +34,15 @@ def energy_distance(x, y):
     and b is a Matrix where each row represents a single-vector document.
     :return: Matrix with res[i][j]  = energy_distance(a[i], b[j])
     """
+
+    print("QUERY    DOCUMENT")
+    print("Type", type(x), type(y))
+    print("Shape", x.shape, y.shape)
+    print(x, y)
+
+
     if not isinstance(x, torch.Tensor):
+        #ValueError: only one element tensors can be converted to Python scalars FIX THIS
         x = torch.tensor(x)
 
     if not isinstance(y, torch.Tensor):
