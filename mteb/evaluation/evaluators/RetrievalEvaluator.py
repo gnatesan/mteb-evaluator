@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 from sentence_transformers.models import Transformer, WordEmbeddings
 
 from .Evaluator import Evaluator
-from .utils import energy_cal, energy_distance, cos_sim, dot_score, hole, mrr, recall_cap, top_k_accuracy
+from .utils import energy_calc, energy_distance, cos_sim, dot_score, hole, mrr, recall_cap, top_k_accuracy
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class DenseRetrievalExactSearch:
         query_embeddings = self.model.encode_queries(
             queries,
             batch_size=self.batch_size,
-            output_value="token_embeddings"
+            output_value="token_embeddings",
             show_progress_bar=self.show_progress_bar,
             convert_to_tensor=self.convert_to_tensor,
         )
