@@ -35,26 +35,17 @@ def energy_distance(x, y):
     :return: Matrix with res[i][j]  = energy_distance(a[i], b[j])
     """
 
-    print("QUERY    DOCUMENT")
-    print("Type", type(x), type(y))
-    print("Shape", x.shape, y.shape)
-    print(x, y)
+    #print("X")
 
+    #print(type(x[0]))
+    #print(type(x[0][0]))
+    #print(type(x[0][0][1]))
 
-    if not isinstance(x, torch.Tensor):
-        #ValueError: only one element tensors can be converted to Python scalars FIX THIS
-        x = torch.tensor(x)
+    #print("Y")
+    #print(type(y[0]))
+    #print(type(y[0][0]))
 
-    if not isinstance(y, torch.Tensor):
-        y = torch.tensor(y)
-
-    if len(x.shape) == 1:
-        x = x.unsqueeze(0)
-
-    if len(y.shape) == 1:
-        y = y.unsqueeze(0)
-
-    num_queries = x.shape[0] #number of queries
+    num_queries = len(x) #number of queries
     num_documents = y.shape[0] #number of documents
 
     # Create a tensor of shape M*N filled with zeros
