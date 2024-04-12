@@ -83,6 +83,9 @@ class DenseRetrievalExactSearch:
 
         itr = range(0, len(corpus), self.corpus_chunk_size)
 
+        num_batches = len(corpus)/self.corpus_chunk_size
+        print("Total Number of batches:", num_batches)
+
         result_heaps = {
             qid: [] for qid in query_ids
         }  # Keep only the top-k docs for each query
@@ -97,6 +100,7 @@ class DenseRetrievalExactSearch:
                 show_progress_bar=self.show_progress_bar,
                 convert_to_tensor=self.convert_to_tensor,
             )
+            print("Batch number:", batch_num)
 
             # Compute similarites using either cosine-similarity, dot product, or energy distance
             cos_scores = self.score_functions[score_function](

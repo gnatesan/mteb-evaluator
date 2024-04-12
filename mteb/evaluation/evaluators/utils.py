@@ -5,6 +5,15 @@ from typing import Dict, List, Tuple
 
 import torch
 
+def ed_calc(x):
+    M = x.shape[0]
+
+    ei_x = 0
+    for j in range(M):
+        for k in range(M):
+            ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
+    return ei_x / (M * M)
+
 
 def energy_calc(x, y):
     M = x.shape[0]
@@ -15,7 +24,7 @@ def energy_calc(x, y):
         for l in range(N):
             ed_sum += (torch.sum(torch.abs(x[j] - y[l]) ** 2) ** (1 / 2))
 
-    ei_x = 0
+    """ei_x = 0
     for j in range(M):
         for k in range(M):
             ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
@@ -25,7 +34,9 @@ def energy_calc(x, y):
         for k in range(N):
             ei_y += (torch.sum(torch.abs(y[j] - y[k]) ** 2) ** (1 / 2))
 
-    return 2*ed_sum / (M * N) - ei_x / (M * M) - ei_y / (N * N)
+    return 2*ed_sum / (M * N) - ei_x / (M * M) - ei_y / (N * N)"""
+    return 2*ed_sum / (M * N)
+
 
 def energy_distance(x, y):
     """
@@ -53,12 +64,14 @@ def energy_distance(x, y):
 
     # Reshape the tensor to shape MxN
     tensor = tensor.reshape(num_queries, num_documents)
+    ed_query = 0
 
     for i in range(num_queries):
+      ed_query = ed_calc(x[i]) #store energy calculation of query to improve runtime
       for j in range(num_documents):
-        #print("Query: ", i, x[i].shape)
-        #print("Document: ", j, y[j].shape, y[j].reshape(1,-1).shape)
-        tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item()
+        print("Query: ", i)
+        print("Document: ", j)
+        tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query
     #print("Answer ", tensor.shape, type(tensor))
     return tensor
 	
