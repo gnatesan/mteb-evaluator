@@ -83,9 +83,6 @@ class DenseRetrievalExactSearch:
 
         itr = range(0, len(corpus), self.corpus_chunk_size)
 
-        num_batches = len(corpus)/self.corpus_chunk_size
-        print("Total Number of batches:", num_batches)
-
         result_heaps = {
             qid: [] for qid in query_ids
         }  # Keep only the top-k docs for each query

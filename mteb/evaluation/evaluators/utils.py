@@ -71,7 +71,7 @@ def energy_distance(x, y):
       for j in range(num_documents):
         print("Query: ", i)
         print("Document: ", j)
-        tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query
+        tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query.item()
     #print("Answer ", tensor.shape, type(tensor))
     return tensor
 	
