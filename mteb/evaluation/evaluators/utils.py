@@ -12,12 +12,18 @@ import torch
     for j in range(M):
         for k in range(M):
             ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
-    return ei_x / (M * M)"""
+    return ei_x / (M * M)
 
 def ed_calc(x):
     M = x.shape[0]
     ei_x = torch.sum(torch.abs(x.unsqueeze(1) - x.unsqueeze(0)) ** 2).sqrt()
-    return ei_x / (M * M)
+    return ei_x / (M * M)"""
+
+def ed_calc(x):
+    M = x.shape[0]
+    x_expanded = x.unsqueeze(1).expand(-1, M, -1)
+    ed_sum = torch.norm(x_expanded - x, dim=2).sum()
+    return ed_sum / (M * M)
 
 
 """def energy_calc(x, y):
@@ -47,24 +53,24 @@ def energy_calc(x, y):
     M = x.shape[0]
     N = y.shape[0]
 
+    # Expand tensors to create all pairs of vectors
     x_expanded = x.unsqueeze(1).expand(-1, N, -1)
     y_expanded = y.unsqueeze(0).expand(M, -1, -1)
     
-    ed_sum = torch.sum(torch.abs(x_expanded - y_expanded) ** 2).sqrt()
+    # Compute pairwise squared Euclidean distances
+    pairwise_diff = x_expanded - y_expanded
+    squared_distances = torch.sum(pairwise_diff ** 2, dim=2)
+
+    # Sum up squared distances and scale by (M * N)
+    ed_sum = torch.sum(torch.sqrt(squared_distances))
 
     return 2 * ed_sum / (M * N)
 
 
 def energy_distance(x, y):
-    """
-    Computes the energy distance energy_distance(a[i], b[j]) for all i and j.
-    a is a Matrix of vectors where each row represents a multi-vector query
-    and b is a Matrix where each row represents a single-vector document.
-    :return: Matrix with res[i][j]  = energy_distance(a[i], b[j])
-    """
 
     num_queries = len(x) #number of queries
-    num_documents = y.shape[0] #number of documents
+    num_documents = len(y) #number of documents
 
     print("Num queries:", num_queries)
     print("Num documents:", num_documents)
@@ -78,12 +84,43 @@ def energy_distance(x, y):
 
     for i in range(num_queries):
       ed_query = ed_calc(x[i]) #store energy calculation of query to improve runtime
+
       for j in range(num_documents):
         #print("Query: ", i)
         #print("Document: ", j)
         tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query.item()
     #print("Answer ", tensor.shape, type(tensor))
     return tensor
+
+"""def energy_distance(x, y):
+    Computes the energy distance energy_distance(a, b).
+    a is a List of Tensors where each row represents a multi-vector query
+    and b is a List where each row represents a single-vector document.
+    :return: Tensor with res[i][j] = energy_distance(a[i], b[j])
+
+    num_queries = len(x)  # number of queries
+    num_documents = len(y)  # number of documents
+
+    print("Num queries:", num_queries)
+    print("Num documents:", num_documents)
+
+      # Calculate energy for all queries
+    ed_queries = torch.empty(len(x))
+	for i, query in enumerate(x):
+    	ed_queries[i] = ed_calc(query)
+
+    # Initialize result tensor
+    tensor = torch.zeros(len(x), len(y))
+
+    # Iterate over queries and documents
+    for i, query in enumerate(x):
+    	print("Query", i)
+        for j, document in enumerate(y):
+            ed_pairwise = torch.norm(query - document.unsqueeze(0), dim=1)
+            tensor[i, j] = 2 * ed_pairwise / (num_queries * num_documents) - ed_queries[i]
+
+    return tensor"""
+
 	
 
 def cos_sim(a, b):
