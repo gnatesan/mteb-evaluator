@@ -75,16 +75,14 @@ def energy_distance(x, y):
     print("Num queries:", num_queries)
     print("Num documents:", num_documents)
 
-    # Create a tensor of shape M*N filled with zeros
-    tensor = torch.zeros(num_queries * num_documents)
+    # Pre-calculate energy for all queries
+    ed_queries = torch.stack([ed_calc(query) for query in x])
 
-    # Reshape the tensor to shape MxN
-    tensor = tensor.reshape(num_queries, num_documents)
-    ed_query = 0
+    # Create a tensor of shape M*N filled with zeros
+    tensor = torch.zeros(num_queries, num_documents)
 
     for i in range(num_queries):
-      ed_query = ed_calc(x[i]) #store energy calculation of query to improve runtime
-
+      ed_query = ed_queries[i] #store energy calculation of query to improve runtime
       for j in range(num_documents):
         #print("Query: ", i)
         #print("Document: ", j)
