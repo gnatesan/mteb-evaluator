@@ -97,7 +97,7 @@ class DenseRetrievalExactSearch:
                 show_progress_bar=self.show_progress_bar,
                 convert_to_tensor=self.convert_to_tensor,
             )
-            print("Batch Size:", batch_size)
+          # print("Batch Size:", batch_size)
 
             # Compute similarites using either cosine-similarity, dot product, or energy distance
             cos_scores = self.score_functions[score_function](
