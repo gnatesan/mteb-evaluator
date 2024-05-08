@@ -106,7 +106,7 @@ class DenseRetrievalExactSearch:
             cos_scores[torch.isnan(cos_scores)] = -1
 
             # If we are using energy distance as score function then top_k_values should be the smallest scores
-            if self.score_function == "cos_sim" or self.score_function == "dot":
+            if score_function == "cos_sim" or score_function == "dot":
                 # Get top-k values
                 cos_scores_top_k_values, cos_scores_top_k_idx = torch.topk(
                     cos_scores,
@@ -115,7 +115,7 @@ class DenseRetrievalExactSearch:
                     largest=True,
                     sorted=return_sorted,
                 )
-            elif self.score_function == "energy_dist":
+            elif score_function == "energy_dist":
                 cos_scores_top_k_values, cos_scores_top_k_idx = torch.topk(
                     cos_scores,
                     min(top_k + 1, len(cos_scores[1])),
