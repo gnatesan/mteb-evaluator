@@ -32,13 +32,16 @@ def energy_calc(x, y):
     return 2 * ed_sum / (M * N)
 
 
+#Function to calculate the energy distance between a batch of queries and a batch of documents.
+#Queries are represented as a list of 2d tensors, and documents are represented by a list of 
+#1d tensors. Implementation is based off of https://pages.stat.wisc.edu/~wahba/stat860public/pdf4/Energy/EnergyDistance10.1002-wics.1375.pdf
 def energy_distance(x, y):
 
     num_queries = len(x) #number of queries
     num_documents = len(y) #number of documents
 
-    print("Num queries:", num_queries)
-    print("Num documents:", num_documents)
+    #print("Num queries:", num_queries)
+    #print("Num documents:", num_documents)
 
     # Pre-calculate energy for all queries
     ed_queries = torch.stack([ed_calc(query) for query in x])
