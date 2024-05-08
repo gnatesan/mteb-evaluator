@@ -5,6 +5,7 @@ from typing import Dict, List, Tuple
 
 import torch
 
+#Function to calculate the energy of all vectors in a query
 def ed_calc(x):
     M = x.shape[0]
     x_expanded = x.unsqueeze(1).expand(-1, M, -1)
@@ -12,6 +13,7 @@ def ed_calc(x):
     return ed_sum / (M * M)
 
 
+#Function to calcjulate the energy between a single vecctor document and multi-vector query
 def energy_calc(x, y):
     M = x.shape[0]
     N = y.shape[0]
@@ -47,10 +49,8 @@ def energy_distance(x, y):
     for i in range(num_queries):
       ed_query = ed_queries[i] #store energy calculation of query to improve runtime
       for j in range(num_documents):
-        #print("Query: ", i)
-        #print("Document: ", j)
         tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query.item()
-    #print("Answer ", tensor.shape, type(tensor))
+
     return tensor
 	
 
