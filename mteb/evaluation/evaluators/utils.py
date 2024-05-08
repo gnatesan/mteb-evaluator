@@ -5,48 +5,11 @@ from typing import Dict, List, Tuple
 
 import torch
 
-"""def ed_calc(x):
-    M = x.shape[0]
-
-    ei_x = 0
-    for j in range(M):
-        for k in range(M):
-            ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
-    return ei_x / (M * M)
-
-def ed_calc(x):
-    M = x.shape[0]
-    ei_x = torch.sum(torch.abs(x.unsqueeze(1) - x.unsqueeze(0)) ** 2).sqrt()
-    return ei_x / (M * M)"""
-
 def ed_calc(x):
     M = x.shape[0]
     x_expanded = x.unsqueeze(1).expand(-1, M, -1)
     ed_sum = torch.norm(x_expanded - x, dim=2).sum()
     return ed_sum / (M * M)
-
-
-"""def energy_calc(x, y):
-    M = x.shape[0]
-    N = y.shape[0]
-
-    ed_sum = 0
-    for j in range(M):
-        for l in range(N):
-            ed_sum += (torch.sum(torch.abs(x[j] - y[l]) ** 2) ** (1 / 2))
-
-    ei_x = 0
-    for j in range(M):
-        for k in range(M):
-            ei_x += (torch.sum(torch.abs(x[j] - x[k]) ** 2) ** (1 / 2))
-
-    ei_y = 0
-    for j in range(N):
-        for k in range(N):
-            ei_y += (torch.sum(torch.abs(y[j] - y[k]) ** 2) ** (1 / 2))
-
-    return 2*ed_sum / (M * N) - ei_x / (M * M) - ei_y / (N * N)
-    return 2*ed_sum / (M * N)"""
 
 
 def energy_calc(x, y):
@@ -89,36 +52,6 @@ def energy_distance(x, y):
         tensor[i][j] = energy_calc(x[i], y[j].reshape(1,-1)).item() - ed_query.item()
     #print("Answer ", tensor.shape, type(tensor))
     return tensor
-
-"""def energy_distance(x, y):
-    Computes the energy distance energy_distance(a, b).
-    a is a List of Tensors where each row represents a multi-vector query
-    and b is a List where each row represents a single-vector document.
-    :return: Tensor with res[i][j] = energy_distance(a[i], b[j])
-
-    num_queries = len(x)  # number of queries
-    num_documents = len(y)  # number of documents
-
-    print("Num queries:", num_queries)
-    print("Num documents:", num_documents)
-
-      # Calculate energy for all queries
-    ed_queries = torch.empty(len(x))
-	for i, query in enumerate(x):
-    	ed_queries[i] = ed_calc(query)
-
-    # Initialize result tensor
-    tensor = torch.zeros(len(x), len(y))
-
-    # Iterate over queries and documents
-    for i, query in enumerate(x):
-    	print("Query", i)
-        for j, document in enumerate(y):
-            ed_pairwise = torch.norm(query - document.unsqueeze(0), dim=1)
-            tensor[i, j] = 2 * ed_pairwise / (num_queries * num_documents) - ed_queries[i]
-
-    return tensor"""
-
 	
 
 def cos_sim(a, b):
